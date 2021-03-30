@@ -4,7 +4,7 @@
 
     class Grafo {
 
-        private $lista_adjacencia = array(), $tabela = array(), $pilha_verificacao = array(), $arestas = 0;
+        private $lista_adjacencia = array(), $tabela = array(), $pilha_verificacao = array(), $fnc = array(), $arestas = 0;
 
         // Adiciona a aresta AB e BA.
         public function adicionar_aresta($a, $b) {
@@ -168,7 +168,7 @@
 
             }
 
-            echo $retorno;
+            echo $retorno."<br><br>";
 
         }
 

@@ -2,3 +2,6 @@
 
 #ignore
 /ignore
+
+#.vscode
+/.vscode
