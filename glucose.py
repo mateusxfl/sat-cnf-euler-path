@@ -2,17 +2,6 @@
 
 # pip install python-sat
 
-import sys, json
-
-try:
-    data = json.loads(sys.argv[1])
-except:
-    print ("ERROR")
-    sys.exit(1)
-
-# Send it to stdout (to PHP)
-# print (json.dumps(data))
-
 from pysat.solvers import Glucose4
 from pysat.formula import CNF
 
@@ -20,18 +9,27 @@ g = Glucose4()
 
 formula = CNF()
 
-for x in data:
+with open('entrada.txt') as f:
+    mylist = [line for line in f]
 
-    predicado = []
+newstr = ""
 
-    for y in x:
-        predicado.append(y)
+for x in mylist:
+    newstr += x
 
-    # print(predicado)
+newstr = newstr.split('\n')
 
-    formula.append(predicado)
+for x in newstr:
+
+    # print(x);
+
+    formula.append(eval(x))
 
 g.append_formula(formula)
 
-print(g.solve())
-print(g.get_model())
+print("Válida: " ,g.solve(), "<br>")
+print("Solução: " ,g.get_model(), "<br>")
+print("Prova: " ,g.get_proof(), "<br>")
+print("Status: " ,g.get_status(), "<br>")
+print("Cláusulas: " ,g.nof_clauses(), "<br>")
+print("Variáveis: " ,g.nof_vars(), "<br>")

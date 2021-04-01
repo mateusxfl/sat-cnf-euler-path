@@ -3,5 +3,5 @@
 #ignore
 /ignore
 
-#.vscode
-/.vscode
+#/entradas
+/entradas
