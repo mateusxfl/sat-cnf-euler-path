@@ -4,7 +4,7 @@
 
     class Grafo {
 
-        private $lista_adjacencia = array(), $tabela = array(), $fnc = array(), $arestas = 0;
+        private $lista_adjacencia = array(), $tabela = array(), $fnc = array(), $arestas = array();
 
         // Adiciona a aresta AB e BA.
         public function adicionar_aresta($a, $b) {
@@ -17,11 +17,11 @@
                 $this->lista_adjacencia[$b] = array();
             }
 
-            // && !in_array($a, $this->lista_adjacencia[$b])
-            if(!in_array($b, $this->lista_adjacencia[$a])) {
+            // && !in_array($b, $this->lista_adjacencia[$a])
+            if(!in_array($a, $this->lista_adjacencia[$b])) {
                 array_push($this->lista_adjacencia[$a], $b);
                 array_push($this->lista_adjacencia[$b], $a);
-                $this->arestas++;
+                array_push($this->arestas, $a."".$b);
             }
 
         }
@@ -39,7 +39,7 @@
                     
                     $this->tabela[$aresta."".$vertice_adjacente] = array();
 
-                    for ( $i = 0 ; $i < $this->arestas ; $i++ ) {
+                    for ( $i = 0 ; $i < count($this->arestas) ; $i++ ) {
                         array_push($this->tabela[$aresta."".$vertice_adjacente], $coordenada++);
                     }
 
@@ -52,13 +52,13 @@
         // Imprime a tabela de coordenadas.
         public function imprime_tabela() {
 
-            $total_casas_decimais = strlen($this->arestas * $this->arestas * 2);
+            $total_casas_decimais = strlen(count($this->arestas) * count($this->arestas) * 2);
 
             echo "<table class='table table-striped table-dark table-sm'><thead><tr>";
 
             echo "<th> XX </th>";
 
-            for ( $i = 1 ; $i <= $this->arestas ; $i++ ) {
+            for ( $i = 1 ; $i <= count($this->arestas) ; $i++ ) {
                 echo "<th>".sprintf("%0".$total_casas_decimais."d", $i)."</th>";
             }
 
@@ -81,11 +81,11 @@
         }
 
         // Captura o valor de uma aresta por sua coordenada.
-        public function captura_valor_aresta($coordenada) {
+        private function captura_valor_aresta($coordenada) {
 
             $indices_arestas = array_keys($this->tabela);
 
-            $linha = $coordenada % $this->arestas == 0 ? floor($coordenada / $this->arestas) - 1 : floor($coordenada / $this->arestas);
+            $linha = $coordenada % count($this->arestas) == 0 ? floor($coordenada / count($this->arestas)) - 1 : floor($coordenada / count($this->arestas));
 
             return $indices_arestas[$linha];
 
@@ -94,21 +94,17 @@
         // Nega todos os valores de uma coluna, menos o passado por parâmetro.
         public function nega_coluna($coordenada) {
            
-            $coluna_atual = $coordenada % $this->arestas == 0 ? $this->arestas : ($coordenada % $this->arestas);
+            $linha_atual = $coordenada % count($this->arestas) == 0 ? count($this->arestas) : ($coordenada % count($this->arestas));
 
             $retorno = array();
 
             for ( $i = 0 ; $i < count($this->tabela) ; $i++ ) {
 
-                if($coordenada != $coluna_atual) {
-
-                    array_push($retorno, [-$coordenada,-$coluna_atual]);
-
-                    // array_push($retorno, [-$coordenada,-$coluna_atual,0]);
-
+                if($coordenada != $linha_atual) {
+                    array_push($retorno, [-$coordenada,-$linha_atual]);
                 }
 
-                $coluna_atual += $this->arestas;
+                $linha_atual += count($this->arestas);
 
             }
 
@@ -119,25 +115,21 @@
         // Nega todos os valores de uma linha, menos o passado por parâmetro.
         public function nega_linha($coordenada) {
 
-            $linha_atual = $coordenada;
+            $coluna_atual = $coordenada;
 
-            while(($linha_atual - 1) % $this->arestas != 0) {
-                $linha_atual--;
+            while(($coluna_atual - 1) % count($this->arestas) != 0) {
+                $coluna_atual--;
             }
 
             $retorno = array();
 
-            for ( $i = 0 ; $i < $this->arestas ; $i++ ) {
+            for ( $i = 0 ; $i < count($this->arestas) ; $i++ ) {
 
-                if($coordenada != $linha_atual) {
-
-                    array_push($retorno, [-$coordenada,-$linha_atual]);
-
-                    // array_push($retorno, [-$coordenada,-$linha_atual,0]);
-
+                if($coordenada != $coluna_atual) {
+                    array_push($retorno, [-$coordenada,-$coluna_atual]);
                 }
                 
-                $linha_atual++;
+                $coluna_atual++;
 
             }
 
@@ -145,19 +137,15 @@
 
         }
 
-        // Nega todos os valores da linha da aresta BA, tendo em vista que já temos uma aresta AB no caminho euleriano.
+        // Nega todos os valores da linha da aresta BA, tendo em vista que já temos uma aresta AB.
         public function nega_aresta_voltando($coordenada) {
 
-            $linha_aresta_negada = $this->tabela[strrev($this->captura_valor_aresta($coordenada))];
+            $linha_aresta_voltando = $this->tabela[strrev($this->captura_valor_aresta($coordenada))];
 
             $retorno = array();
 
-            for ( $i = 0 ; $i < count($linha_aresta_negada) ; $i++ ) {
-
-                array_push($retorno, [-$coordenada,-$linha_aresta_negada[$i]]);
-
-                // array_push($retorno, [-$coordenada,-$linha_aresta_negada[$i],0]);
-
+            for ( $i = 0 ; $i < count($linha_aresta_voltando) ; $i++ ) {
+                array_push($retorno, [-$coordenada,-$linha_aresta_voltando[$i]]);
             }
 
             return $retorno;
@@ -167,18 +155,18 @@
         // Gera os possíveis caminhos posteriores a coordenada passada por parâmetro.
         public function busca_arestas_adjacentes($coordenada) {
 
-            if($coordenada % $this->arestas == 0) {
+            if($coordenada % count($this->arestas) == 0) {
                 return array();
             }else{
-                $proxima_coluna = $coordenada % $this->arestas;
+                $proxima_coluna = $coordenada % count($this->arestas);
             }
 
             $vertice_anterior = substr($this->captura_valor_aresta($coordenada), 0, 1);
             $vertice_atual =  substr($this->captura_valor_aresta($coordenada), -1);
 
-            $retorno = array(); $valores = array();
+            $retorno = array(array());
 
-            array_push($valores, -$coordenada);
+            array_push($retorno[0], -$coordenada);
 
             for ( $i = 0 ; $i < count($this->lista_adjacencia[$vertice_atual]) ; $i++ ) {
 
@@ -186,22 +174,35 @@
 
                     $proxima_aresta = $vertice_atual."".$this->lista_adjacencia[$vertice_atual][$i];
 
-                    array_push($valores, $this->tabela[$proxima_aresta][$proxima_coluna]);
+                    array_push($retorno[0], $this->tabela[$proxima_aresta][$proxima_coluna]);
    
                 }
 
             }
 
-            array_push($retorno, $valores);
-
-            // array_push($valores, 0);
-            // array_push($retorno, $valores);
-
             return $retorno;
 
         }
 
-        // Imprime o vetor retornado pelas 4 funções anteriores.
+        // A cláusula positiva contém uma aresta indo e voltando, tendo em vista que so um valor da clausula acontece.
+        public function clausula_positiva($aresta) {
+
+            $retorno = array();
+
+            // for ( $i = 0 ; $i < count($this->arestas) ; $i++ ) {
+
+                $linha_aresta_indo = $this->tabela[$aresta];
+                $linha_aresta_voltando = $this->tabela[strrev($aresta)];
+
+                array_push($retorno, array_merge($linha_aresta_indo,  $linha_aresta_voltando));
+
+            // }
+
+           return $retorno;
+        
+        }
+
+        // Imprime qualquer um dos vetores retornado pelos 5 métodos anteriores.
         public function imprimeRetorno($vetor) {
 
             foreach($vetor as $valor){
@@ -213,37 +214,35 @@
         // Gera toda a FNC relativa as restrições do grafo.
         function gera_clausulas() {
 
-            // $line1 = [1,2,3,4,5,6,7,8,9,10];
-            // $line2 = [11,12,13,14,15,16,17,18,19,20];
-            // $line3 = [21,22,23,24,25,26,27,28,29,30];
-            // $line4 = [31,32,33,34,35,36,37,38,39,40];
-            // $line5 = [41,42,43,44,45,46,47,48,49,50];
+            sort($this->arestas); $this->clausula_positiva = array();
 
-            // array_push($this->fnc, $line1);
-            // array_push($this->fnc, $line2);
-            // array_push($this->fnc, $line3);
-            // array_push($this->fnc, $line4);
-            // array_push($this->fnc, $line5);
-
-            for ( $i = 1 ; $i <= count($this->tabela) * $this->arestas ; $i++ ) {
+            // 450 OK
+            for ( $i = 1 ; $i <= count($this->tabela) * count($this->arestas) ; $i++ ) {
                 $this->fnc = array_merge($this->fnc, $this->nega_coluna($i));
             }
 
-            for ( $i = 1 ; $i <= count($this->tabela) * $this->arestas ; $i++ ) {
+            // 200 OK
+            for ( $i = 1 ; $i <= count($this->tabela) * count($this->arestas) ; $i++ ) {
                 $this->fnc = array_merge($this->fnc, $this->nega_linha($i));
             }
 
-            for ( $i = 1 ; $i <= count($this->tabela) * $this->arestas ; $i++ ) {
+            // 250 OK
+            for ( $i = 1 ; $i <= count($this->tabela) * count($this->arestas) ; $i++ ) {
                 $this->fnc = array_merge($this->fnc, $this->nega_aresta_voltando($i));
             }
 
-            for ( $i = 1 ; $i <= count($this->tabela) * $this->arestas ; $i++ ) {
+            // 40 OK
+            for ( $i = 1 ; $i <= count($this->tabela) * count($this->arestas) ; $i++ ) {
                 $this->fnc = array_merge($this->fnc, $this->busca_arestas_adjacentes($i));
             }
 
-            // echo "<pre> FNC: "; var_dump($this->fnc); echo "</pre>";
+            // 5 OK
+            foreach($this->arestas as $aresta) {
+                $this->clausula_positiva = array_merge($this->clausula_positiva, $this->clausula_positiva($aresta));
+                $this->fnc = array_merge($this->fnc, $this->clausula_positiva($aresta));
+            }
 
-            // Falta restrições.
+            // echo "<pre> FNC: "; var_dump($this->fnc); echo "</pre>";
 
             $this->requisicao();
 
@@ -254,12 +253,11 @@
             $arquivo = fopen('entrada.txt','w');
 
             if ($arquivo == false) {
-                echo 'Não foi possível criar o arquivo.';
+                echo 'Não foi possível criar o arquivo com as cláusulas.';
             }else{
 
                 $texto = "";
                 
-                // Imprime retorno;
                 foreach($this->fnc as $valor){
                     $texto .= "[".implode(",", $valor)."]\n";
                 }
@@ -271,7 +269,7 @@
 
                 $resultado = shell_exec('glucose.py');
 
-                echo "<br> <div class='col-md-12'>".utf8_encode($resultado)."</div> <br>";
+                echo utf8_encode($resultado);
 
             }
 
@@ -295,10 +293,10 @@
 
 <div class="col-md-12 mt-3">
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <?php $grafo->imprime_tabela(); ?>
         </div>
-        <div class="col-md-9">
+        <div class="col-md-10">
             <?php $grafo->gera_clausulas(); ?>
         </div>
     </div>
@@ -307,7 +305,7 @@
 <div class="col-md-12">
     <div class="row">
 
-        <div class="col-md-3">
+        <div class="col-md-2">
             <?php $grafo->imprime_tabela(); ?>
         </div>
 
@@ -329,6 +327,11 @@
         <div class="col-md-2">
             <strong>Gera posteriores <?php echo $coordenada; ?>.</strong> <br>
             <?php  $grafo->imprimeRetorno($grafo->busca_arestas_adjacentes($coordenada)); ?>   
+        </div>
+
+        <div class="col-md-2">
+            <strong>Cláusula positiva X.</strong> <br>
+            <?php  $grafo->imprimeRetorno($grafo->clausula_positiva); ?>   
         </div>
 
     </div>

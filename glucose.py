@@ -12,24 +12,24 @@ formula = CNF()
 with open('entrada.txt') as f:
     mylist = [line for line in f]
 
-newstr = ""
+clausulas = ""
 
 for x in mylist:
-    newstr += x
+    clausulas += x
 
-newstr = newstr.split('\n')
+clausulas = clausulas.split('\n')
 
-for x in newstr:
-
-    # print(x);
-
+for x in clausulas:
     formula.append(eval(x))
 
 g.append_formula(formula)
 
-print("Válida: " ,g.solve(), "<br>")
-print("Solução: " ,g.get_model(), "<br>")
-print("Prova: " ,g.get_proof(), "<br>")
-print("Status: " ,g.get_status(), "<br>")
-print("Cláusulas: " ,g.nof_clauses(), "<br>")
-print("Variáveis: " ,g.nof_vars(), "<br>")
+print("<strong> Válida: </strong>" ,g.solve(), "<br>")
+#print("Solução: " ,g.get_model(), "<br>")
+print("<strong> Cláusulas: </strong>" ,g.nof_clauses(), "<br>")
+print("<strong> Variáveis: </strong>" ,g.nof_vars(), "<br>")
+
+print("<br><strong> Solução: </strong><br>")
+for p in g.get_model():
+  if p > 0:
+    print(p-1, clausulas[p-1], end=' <br> ')
