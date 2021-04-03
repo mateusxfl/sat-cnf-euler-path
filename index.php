@@ -2,9 +2,9 @@
 
     class Grafo {
 
-        private $lista_adjacencia = array(), $tabela = array(), $fnc = array(), $arestas = array();
+        private $lista_adjacencia = array(), $tabela = array(), $ajax = array(), $fnc = array(), $arestas = array();
 
-        // Adiciona a aresta AB e BA.
+        // Adiciona a aresta AB e BA na lista de adjacência, assim como preenche o vetor ajax com os dados do JSON a ser gerado.
         public function adicionar_aresta($a, $b) {
 
             if(!isset($this->lista_adjacencia[$a])) {
@@ -20,6 +20,17 @@
                 array_push($this->lista_adjacencia[$a], $b);
                 array_push($this->lista_adjacencia[$b], $a);
                 array_push($this->arestas, $a."".$b);
+
+                if(!isset($this->ajax[$a])){
+                    $this->ajax[$a] = array();
+                }
+
+                if(!isset($this->ajax[$b])){
+                    $this->ajax[$b] = array();
+                }
+
+                array_push($this->ajax[$a], $b);
+                
             }
 
         }
@@ -42,6 +53,52 @@
                     }
 
                 }
+
+            }
+
+        }
+
+        // Gera um arquivo AJAX, para a renderização do grafo.
+        public function cria_ajax() {
+
+            $arquivo = fopen('data.json','w');
+
+            if ($arquivo == false) {
+                echo 'Não foi possível criar o arquivo com as cláusulas.';
+            }else{
+
+                ksort($this->ajax);
+
+                $dados_ajax = "[\n";
+
+                foreach ($this->ajax as $key => &$pai) {
+
+                    sort($pai);
+                    
+                    $dados_ajax .= "\t{\n";
+
+                    $dados_ajax .= "\t\t\"id\": \"".strtoupper($key)."\",\n";
+
+                    $dados_ajax .= "\t\t\"parentIds\": [";
+
+                    if(count($pai) > 0) {
+                        $dados_ajax .= "\"".strtoupper(implode($pai, '","'))."\"";
+                    }    
+                    
+                    $dados_ajax .= "]\n";
+
+                    $dados_ajax .= "\t},\n";
+
+                }
+
+                $dados_ajax = substr($dados_ajax, 0, -2);
+
+                $dados_ajax .= "\n]";
+
+                // echo $ajax;
+                
+                fwrite($arquivo, $dados_ajax);
+                fclose($arquivo);
 
             }
 
@@ -303,6 +360,8 @@
     // $grafo->adicionar_aresta("g", "a");
 
     $grafo->cria_tabela();
+
+    $grafo->cria_ajax();
 
     $grafo->gera_clausulas();
 

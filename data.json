@@ -1,0 +1,18 @@
+[
+	{
+		"id": "A",
+		"parentIds": ["B","C"]
+	},
+	{
+		"id": "B",
+		"parentIds": ["C","D"]
+	},
+	{
+		"id": "C",
+		"parentIds": ["D"]
+	},
+	{
+		"id": "D",
+		"parentIds": []
+	}
+]
