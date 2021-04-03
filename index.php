@@ -29,7 +29,14 @@
                     $this->ajax[$b] = array();
                 }
 
-                array_push($this->ajax[$a], $b);
+                $chaves_array = array_keys($this->ajax);
+
+                if(array_search($a, $chaves_array) < array_search($b, $chaves_array)) {
+                    array_push($this->ajax[$a], $b);
+                }else{
+                    array_push($this->ajax[$b], $a);
+                }
+
                 
             }
 
@@ -345,19 +352,19 @@
 
     $grafo = new Grafo();
 
-    $grafo->adicionar_aresta("a", "c");
-    $grafo->adicionar_aresta("a", "b");
-    $grafo->adicionar_aresta("b", "d");
-    $grafo->adicionar_aresta("b", "c");
-    $grafo->adicionar_aresta("c", "d");
-
+    // $grafo->adicionar_aresta("a", "c");
     // $grafo->adicionar_aresta("a", "b");
+    // $grafo->adicionar_aresta("b", "d");
     // $grafo->adicionar_aresta("b", "c");
     // $grafo->adicionar_aresta("c", "d");
-    // $grafo->adicionar_aresta("d", "e");
-    // $grafo->adicionar_aresta("e", "f");
-    // $grafo->adicionar_aresta("f", "g");
-    // $grafo->adicionar_aresta("g", "a");
+
+    $grafo->adicionar_aresta("a", "b");
+    $grafo->adicionar_aresta("b", "c");
+    $grafo->adicionar_aresta("c", "d");
+    $grafo->adicionar_aresta("d", "e");
+    $grafo->adicionar_aresta("e", "f");
+    $grafo->adicionar_aresta("f", "g");
+    $grafo->adicionar_aresta("g", "a");
 
     $grafo->cria_tabela();
 
