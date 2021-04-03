@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
 <?php
 
     class Grafo {
@@ -50,7 +48,7 @@
         }
 
         // Imprime a tabela de coordenadas.
-        public function imprime_tabela() {
+        public function imprime_tabela($solucao = null) {
 
             $total_casas_decimais = strlen(count($this->arestas) * count($this->arestas) * 2);
 
@@ -69,7 +67,11 @@
                 echo "<tr><th>".strtoupper($aresta)."</th>";
 
                 foreach($coordenadas as $valor_coordenada) {
-                    echo "<td>".sprintf("%0".$total_casas_decimais."d", $valor_coordenada)."</td>";
+                    if(isset($solucao) && in_array($valor_coordenada, $solucao)) {
+                        echo "<th style='color:red'>".sprintf("%0".$total_casas_decimais."d", $valor_coordenada)."</th>";
+                    }else{
+                        echo "<td>".sprintf("%0".$total_casas_decimais."d", $valor_coordenada)."</td>";
+                    }
                 }
 
                 echo "</tr>";
@@ -81,7 +83,7 @@
         }
 
         // Captura o valor de uma aresta por sua coordenada.
-        private function captura_valor_aresta($coordenada) {
+        public function captura_valor_aresta($coordenada) {
 
             $indices_arestas = array_keys($this->tabela);
 
@@ -189,16 +191,12 @@
 
             $retorno = array();
 
-            // for ( $i = 0 ; $i < count($this->arestas) ; $i++ ) {
+            $linha_aresta_indo = $this->tabela[$aresta];
+            $linha_aresta_voltando = $this->tabela[strrev($aresta)];
 
-                $linha_aresta_indo = $this->tabela[$aresta];
-                $linha_aresta_voltando = $this->tabela[strrev($aresta)];
+            array_push($retorno, array_merge($linha_aresta_indo,  $linha_aresta_voltando));
 
-                array_push($retorno, array_merge($linha_aresta_indo,  $linha_aresta_voltando));
-
-            // }
-
-           return $retorno;
+            return $retorno;
         
         }
 
@@ -248,6 +246,7 @@
 
         }
 
+        // Gera um arquivo com todas as cláusulas e faz a requisição ao pySAT.
         function requisicao() {
 
             $arquivo = fopen('entrada.txt','w');
@@ -269,7 +268,17 @@
 
                 $resultado = shell_exec('glucose.py');
 
-                echo utf8_encode($resultado);
+                $resultado = explode("\n", $resultado);
+
+                // echo "<pre>"; var_dump($resultado); echo "</pre>";
+
+                array_pop($resultado);
+
+                $this->status = array_shift($resultado);
+                $this->clausulas = array_shift($resultado);
+                $this->variaveis = array_shift($resultado);
+
+                $this->solucao = $resultado;
 
             }
 
@@ -285,56 +294,118 @@
     $grafo->adicionar_aresta("b", "c");
     $grafo->adicionar_aresta("c", "d");
 
+    // $grafo->adicionar_aresta("a", "b");
+    // $grafo->adicionar_aresta("b", "c");
+    // $grafo->adicionar_aresta("c", "d");
+    // $grafo->adicionar_aresta("d", "e");
+    // $grafo->adicionar_aresta("e", "f");
+    // $grafo->adicionar_aresta("f", "g");
+    // $grafo->adicionar_aresta("g", "a");
+
     $grafo->cria_tabela();
+
+    $grafo->gera_clausulas();
 
     $coordenada = 1;
 
 ?>
 
-<div class="col-md-12 mt-3">
-    <div class="row">
-        <div class="col-md-2">
-            <?php $grafo->imprime_tabela(); ?>
-        </div>
-        <div class="col-md-10">
-            <?php $grafo->gera_clausulas(); ?>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<style>
+
+    body {
+        zoom: 0.67;
+    }
+
+</style>
+
+<div class="conteudo">
+
+    <div class="col-md-12 mt-3">
+        <div class="row">
+
+            <div class="col-md-4">
+                <?php $grafo->imprime_tabela(); ?>
+            </div>
+            
+            <div class="col-md-4">
+                <?php $grafo->imprime_tabela($grafo->solucao); ?>
+            </div>
+
+            <div class="col-md-4">
+                <?php 
+
+                    $status = $grafo->status == "True" ? "Válido" : "Inválido";
+                
+                    echo "
+                        <table class='table table-striped table-dark table-sm'>
+                            <tr>
+                                <th>STATUS</th>
+                                <td>$status</td>
+                            </tr>
+                            <tr>
+                                <th>CLÁUSULAS</th>
+                                <td>$grafo->clausulas</td>
+                            </tr>
+                            <tr>
+                                <th>VARIÁVEIS</th>
+                                <td>$grafo->variaveis</td>
+                            </tr>
+                        </table>
+                    ";
+
+                    // echo "<h3>";
+                    //     foreach($grafo->solucao as $coordenada_atual){
+                    //         echo strtoupper($grafo->captura_valor_aresta($coordenada_atual))." ";
+                    //     }
+                    // echo "</h3>";
+                
+                ?>
+            </div>
+
+            
+
         </div>
     </div>
-</div>
 
-<div class="col-md-12">
-    <div class="row">
+    <hr>
 
-        <div class="col-md-2">
-            <?php $grafo->imprime_tabela(); ?>
+    <div class="col-md-12">
+        <div class="row">
+
+            <div class="col-md-2">
+                <?php $grafo->imprime_tabela(); ?>
+            </div>
+
+            <div class="col-md-2">
+                <strong>Nega coluna <?php echo $coordenada; ?>.</strong> <br>
+                <?php $grafo->imprimeRetorno($grafo->nega_coluna($coordenada)); ?>   
+            </div>
+
+            <div class="col-md-2">
+                <strong>Nega linha <?php echo $coordenada; ?>.</strong> <br>
+                <?php $grafo->imprimeRetorno($grafo->nega_linha($coordenada)); ?>   
+            </div>
+
+            <div class="col-md-2">
+                <strong>Nega aresta voltando <?php echo $coordenada; ?>.</strong> <br>
+                <?php $grafo->imprimeRetorno($grafo->nega_aresta_voltando($coordenada)); ?>   
+            </div>
+
+            <div class="col-md-2">
+                <strong>Gera posteriores <?php echo $coordenada; ?>.</strong> <br>
+                <?php  $grafo->imprimeRetorno($grafo->busca_arestas_adjacentes($coordenada)); ?>   
+            </div>
+
+            <div class="col-md-2">
+                <strong>Cláusula positiva X.</strong> <br>
+                <?php  $grafo->imprimeRetorno($grafo->clausula_positiva); ?>   
+            </div>
+
         </div>
-
-        <div class="col-md-2">
-            <strong>Nega coluna <?php echo $coordenada; ?>.</strong> <br>
-            <?php $grafo->imprimeRetorno($grafo->nega_coluna($coordenada)); ?>   
-        </div>
-
-        <div class="col-md-2">
-            <strong>Nega linha <?php echo $coordenada; ?>.</strong> <br>
-            <?php $grafo->imprimeRetorno($grafo->nega_linha($coordenada)); ?>   
-        </div>
-
-        <div class="col-md-2">
-            <strong>Nega aresta voltando <?php echo $coordenada; ?>.</strong> <br>
-            <?php $grafo->imprimeRetorno($grafo->nega_aresta_voltando($coordenada)); ?>   
-        </div>
-
-        <div class="col-md-2">
-            <strong>Gera posteriores <?php echo $coordenada; ?>.</strong> <br>
-            <?php  $grafo->imprimeRetorno($grafo->busca_arestas_adjacentes($coordenada)); ?>   
-        </div>
-
-        <div class="col-md-2">
-            <strong>Cláusula positiva X.</strong> <br>
-            <?php  $grafo->imprimeRetorno($grafo->clausula_positiva); ?>   
-        </div>
-
     </div>
+
 </div>
 
 <script href="jquery-3.5.1.min.js"></script>

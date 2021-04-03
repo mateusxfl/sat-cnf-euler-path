@@ -24,12 +24,13 @@ for x in clausulas:
 
 g.append_formula(formula)
 
-print("<strong> Válida: </strong>" ,g.solve(), "<br>")
-#print("Solução: " ,g.get_model(), "<br>")
-print("<strong> Cláusulas: </strong>" ,g.nof_clauses(), "<br>")
-print("<strong> Variáveis: </strong>" ,g.nof_vars(), "<br>")
+print(g.solve())
+print(g.nof_clauses())
+print(g.nof_vars())
 
-print("<br><strong> Solução: </strong><br>")
-for p in g.get_model():
-  if p > 0:
-    print(p-1, clausulas[p-1], end=' <br> ')
+# print("Solução: " ,g.get_model(), "<br>")
+
+for s in g.get_model():
+  if s > 0:
+    # print(s-1)
+    print(s)
