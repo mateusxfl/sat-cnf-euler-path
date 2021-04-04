@@ -390,7 +390,7 @@
         // Gera um arquivo com todas as cláusulas e faz a requisição ao pySAT.
         function requisicao() {
 
-            // Cria / Sobrescreve o arquivo entrada.json.
+            // Cria / Sobrescreve o arquivo entrada.txt.
             $arquivo = fopen('entrada.txt','w');
 
             // Se o arquivo não abre, é retornado a mensagem.
@@ -454,6 +454,7 @@
     // $grafo->adicionar_aresta("e", "f");
     // $grafo->adicionar_aresta("f", "g");
     // $grafo->adicionar_aresta("g", "a");
+    // $grafo->adicionar_aresta("h", "j");
 
     $grafo->cria_tabela();
 
