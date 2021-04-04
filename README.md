@@ -1,14 +1,14 @@
-# Axiomatic Checker
+# Eulerian Path Checker
 
 <p>
   <img src="https://img.shields.io/badge/made%20by-MATEUS%20FONSECA-6E40C9?style=flat-square">
 
   <img alt="GitHub language count" src="https://img.shields.io/github/languages/count/mateusxfl/sat-cnf-euler-path?color=6E40C9&style=flat-square">
 
-  <img alt="GitHub Top Language" src="https://img.shields.io/github/languages/top/mateusxfl/axiomatic-checker?color=6E40C9&style=flat-square">
+  <img alt="GitHub Top Language" src="https://img.shields.io/github/languages/top/mateusxfl/sat-cnf-euler-path?color=6E40C9&style=flat-square">
 
-  <a href="https://github.com/mateusxfl/axiomatic-checker/commits/master">
-    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/mateusxfl/axiomatic-checker?color=6E40C9&style=flat-square">
+  <a href="https://github.com/mateusxfl/sat-cnf-euler-path/commits/master">
+    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/mateusxfl/sat-cnf-euler-path?color=6E40C9&style=flat-square">
   </a>
 </p>
 
@@ -48,7 +48,7 @@ Tecnologias e ferramentas utilizadas no desenvolvimento do projeto:
 
 <br>
 
-Feito com :purple_heart: by [Mateus Fonseca](https://mateusxfl/axiomatic-checker)
+Feito com :purple_heart: by [Mateus Fonseca](https://mateusxfl/sat-cnf-euler-path)
 
 [![Linkedin Badge](https://img.shields.io/badge/-Mateus%20Fonseca-6E40C9?style=flat-square&logo=Linkedin&logoColor=white&link=https://www.linkedin.com/in/mateusxfl/)](https://www.linkedin.com/in/mateusxfl/) 
 [![Gmail Badge](https://img.shields.io/badge/-mateus.xfl@gmail.com-6E40C9?style=flat-square&logo=Gmail&logoColor=white&link=mailto:mateus.xfl@gmail.com)](mailto:mateus.xfl@gmail.com)
