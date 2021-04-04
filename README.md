@@ -16,8 +16,6 @@
 
 O Eulerian Path Checker usa o método [SAT](https://pt.wikipedia.org/wiki/Problema_de_satisfatibilidade_booliana) para solucionar problemas relativos a grafos, como a busca de um possível [caminho euleriano]https://pt.wikipedia.org/wiki/Caminho_euleriano). Tal aplicativo foi proposto como um trabalho na disciplina de Lógica para computação na UFC - Russas.
 
-<br>
-
 ## Tecnologias
 
 Tecnologias e ferramentas utilizadas no desenvolvimento do projeto:
